@@ -666,7 +666,7 @@ static void printprolog()
 
 	printf( "/cutmark	%% - cutmark -\n"
 		"{		%% draw cutline\n"
-		"	0.23 setlinewidth 0 setgray\n"
+		"	0.5 setlinewidth 0 setgray\n"
 		"	clipmargin\n"
 		"	dup 0 moveto\n"
 		"	dup neg leftmargin add 0 rlineto stroke\n"
@@ -724,11 +724,11 @@ static void printprolog()
 	        "	%% print the page label\n"
 	        "	0 setgray\n"
 	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n"
-	        "	(Grid \\( ) show\n"
+	        "	(Page \\() show\n"
 	        "	rowcount strg cvs show\n"
-	        "	( , ) show\n"
+	        "	(,) show\n"
 	        "	colcount strg cvs show\n"
-	        "	( \\)) show\n"
+	        "	(\\) - MakeMyPattern.com) show\n"
 	        "	showpage\n"
                 "} bind def\n\n");
 
