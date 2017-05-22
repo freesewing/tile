@@ -1,5 +1,5 @@
 /*
-#  poster - resize a postscript image to print on larger media and/or multiple sheets
+#  tile - resize a postscript image to print on larger media and/or multiple sheets
 #
 #  This program scales a PostScript page to a given size (a poster).
 #  The output can be tiled on multiple sheets, and output
@@ -11,7 +11,7 @@
 #  'normal' postscript files as well.
 #
 #  Compile this program with:
-#        cc -O -o poster poster.c -lm
+#        cc -O -o tile tile.c -lm
 #  or something alike.
 #
 #  Maybe you want to change the `DefaultMedia' and `DefaultImage'
@@ -29,17 +29,14 @@
 #  you might want to set `Gv_gs_orientbug 0'
 #
 # --------------------------------------------------------------
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation.
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY;
-#  The full text of the GNU General Public License is supplied
-#  with 'poster' in the file LICENSE.
+#  Tile is a fork of 'poster' by Jos T.J. van Eijndhoven 
+#  <J.T.J.v.Eijndhoven@ele.tue.nl>
+#
+#  Forked by Joost De Cock for freesewing.org
 #
 #  Copyright (C) 1999 Jos T.J. van Eijndhoven
+#  Copyright (C) 2017 Joost De Cock
 # --------------------------------------------------------------
-# email: J.T.J.v.Eijndhoven@ele.tue.nl
 */
 
 #define Gv_gs_orientbug 1
@@ -729,7 +726,7 @@ static void printprolog()
 	        "	(, column ) show\n"
 	        "	colcount strg cvs show\n"
 	        "	pagewidth 69 sub clipmargin labelsize add neg botmargin add moveto\n"
-	        "	(MakeMyPattern.com ) show\n"
+	        "	(freesewing.org ) show\n"
 	        "	showpage\n"
                 "} bind def\n\n");
 

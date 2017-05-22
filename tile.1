@@ -1,14 +1,14 @@
-.TH POSTER 1
+.TH TILE 1
 .fi
 .SH NAME
-poster \- Scale and tile a postscript image to print on multiple pages
+tile \- Scale and tile a postscript image to print on multiple pages
 .SH SYNOPSIS
 .in +7n
 .ti -7n
-poster <options> infile
+tile <options> infile
 .in -7n
 .SH DESCRIPTION
-\fIPoster\fP can be used to create a large poster by building it
+\fITile\fP can be used to create a large poster by building it
 from multiple pages and/or printing it on large media.
 It expects as input a generic (encapsulated) postscript
 file, normally printing on a single page.
@@ -40,16 +40,16 @@ Its input file should best be a real `Encapsulated Postscript' file
 Such files can be generated from about all current drawing applications,
 and text processors like Word, Interleaf and Framemaker.
 .br
-However \fIposter\fP tries to behave properly also on more relaxed,
+However \fItile\fP tries to behave properly also on more relaxed,
 general postscript files containing a single page definition.
 Proper operation is obtained for instance on pages generated
 by (La)TeX and (g)troff.
 .P
 The media to print on can be selected independently from the input image size
-and/or the poster size. \fIPoster\fP will determine by itself whether it
+and/or the poster size. \fITile\fP will determine by itself whether it
 is beneficial to rotate the output image on the media.
 .P
-To preview the output results of \fIposter\fP and/or to (re-)print individual
+To preview the output results of \fItile\fP and/or to (re-)print individual
 output pages, you should use a postscript previewer like ghostview(1).
 
 .ne 5
@@ -79,7 +79,7 @@ The default is set at compile time, being A4 in the standard package.
 .TP
 -p <box>
 Specify the poster size. See below for <box>.
-Since \fIposter\fP will autonomously choose for rotation,
+Since \fItile\fP will autonomously choose for rotation,
 always specify a `portrait' poster size (i.e. higher then wide).
 .br
 If you don't give the -s option, the default poster size is identical to the
@@ -150,27 +150,27 @@ Distance names are like `cm', `i', `ft'.
 .SH EXAMPLES
 The following command prints an A4 input file on 8 A3 pages, forming an A0
 poster:
-         poster -v -iA4 -mA3 -pA0 infile >outfile
+         tile -v -iA4 -mA3 -pA0 infile >outfile
 
 .ne 3
 The next command prints an eps input image on a poster of 3x3 Letter pages:
-         poster -v -mLet -p3x3Let  image.eps > outfile
+         tile -v -mLet -p3x3Let  image.eps > outfile
 
 .ne 3
 The next command enlarges an eps input image to print on a
 large-media A0 capable device, maintaining 2 inch margins:
-         poster -v -mA0 -w2x2i image.eps > outfile
+         tile -v -mA0 -w2x2i image.eps > outfile
 
 .ne 3
 Enlarge a postscript image exactly 4 times, print on the default A4 media,
-and let \fIposter\fP determine the number of pages required:
-         poster -v -s4 image.eps > outfile
+and let \fItile\fP determine the number of pages required:
+         tile -v -s4 image.eps > outfile
 
 .ne 6
 Scale a postscript image to a poster of about 1 square meter, printing
 on `Legal' media, maintaining a 10% of `Legal' size as white margin
 around the poster.
-         poster -v -mLegal -p1x1m -w10% infile.ps >outfile
+         tile -v -mLegal -p1x1m -w10% infile.ps >outfile
 
 .ne 5
 .SH "PROBLEMS & QUESTIONS"
@@ -181,7 +181,7 @@ you might have this problem.
 Such pixel images are normally made to fit well to standard 300 (or 600) dpi devices.
 Scaling such a picture with an uncarefully chosen factor,
 can easily lead to hazy edges and interference patterns on the output.
-The solution is to provide \fIposter\fP with an exact scaling factor
+The solution is to provide \fItile\fP with an exact scaling factor
 (with the -s option), chosen as an integer. If integer scaling is
 unpractical for your purpose,
 choose a fractional number made from a small integer denominator (2, 3, 4).
@@ -194,21 +194,21 @@ One way to obtain such numbers is previewing the original image with
 ghostview,
 and observing the coordinate numbers which it continually displays.
 These numbers are in postscript units (points),
-named by \fIposter\fP as just `p'.
-.SS "Poster doesn't seem to work properly, output pages are empty"
-The major cause for poster not to work correctly, is giving it
+named by \fItile\fP as just `p'.
+.SS "Tile doesn't seem to work properly, output pages are empty"
+The major cause for tile not to work correctly, is giving it
 postscript files which don't conform to proper 'eps' behaviour.
 Try whether your application (or printer driver) cannot generate
 real 'encapsulated postscript'.
 .SS "If I ask for a 50x50cm poster, it always generates something bigger"
 Yes, probably. When specifying a desired output size with the `-p' option,
-\fIposter\fP first determines an array of sheets to cover such an area.
+\fItile\fP first determines an array of sheets to cover such an area.
 Then it determines a scale factor for the picture to fill these sheets upto
 their edge. As result your requested size is used as rough guess only.
 If you want an exact output size, specify the scaling factor yourself
 with the `-s' option (and omit the `-p').
 .SS "I want to keep the white space around the poster as in my original"
-\fIPoster\fP will as default use the input image bounding box, and
+\fITile\fP will as default use the input image bounding box, and
 scale/translate that to the edges of your poster.
 If the program which generated your input file specifies an exact and tight
 %%BoundingBox, you will indeed loose your white margin.
@@ -243,7 +243,7 @@ Remove the remaining cutmargin around the poster.
 .ne 4
 .SH "DEVICE SETTINGS"
 For postscript level-2 capable printers/plotters, which is about all modern postscript
-devices today, \fIposter\fP will send device settings in its output file.
+devices today, \fItile\fP will send device settings in its output file.
 This consists of a `setpagedevice' call, setting:
 .TP 2n
 -
@@ -261,7 +261,7 @@ Clearly that is not what you want to print a poster.
 -
 manual media feed.
 .br
-This is given only when \fIposter\fP was executed with the `-f'
+This is given only when \fItile\fP was executed with the `-f'
 command line option. This is a convenient feature if you want to print
 your job on different media than normally installed in the paper tray,
 and you are submitting your job through a multi-user networking and
@@ -275,7 +275,7 @@ The settings thus passed in the postscript file, will affect the device
 for this job only.
  
 .SH "DSC CONFORMANCE"
-\fIPoster\fP will generate its own DSC header and other DSC lines
+\fITile\fP will generate its own DSC header and other DSC lines
 in the output file, according the `Document Structuring Conventions - version
 3.0',
 as written down in the `Postscript Language Reference Manual, 2nd ed.' from
