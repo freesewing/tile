@@ -3,7 +3,7 @@
 # Freesewing tile
 [Freesewing](https://freesewing.org/) is an online platform to draft sewing patterns based on your measurements.
 
-> This is tile core repository, which holds __tile__ a tool to tile PostScript images on multiple pages.
+> This is our tile repository, which holds __tile__ a tool to tile PostScript images on multiple pages.
 > 
 > Tile is a fork of Poster, by Jos T.J. van Eijndhoven
 
