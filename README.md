@@ -7,7 +7,7 @@
 > 
 > Tile is a fork of Poster, by Jos T.J. van Eijndhoven
 
-For all info on what freesewing does/is/provides, please check the freesewing documentation at [docs.freesewing.org](https://docs.freesewing.org).
+For all info on what freesewing does/is/provides, please check [freesewing.org](https://freesewing.org).
 
 ## Installation
 
