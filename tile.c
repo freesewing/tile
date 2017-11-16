@@ -76,6 +76,7 @@ static void margin_convert( char *spec, double margin[2]);
 static int mystrncasecmp( const char *s1, const char *s2, int n);
 
 int verbose;
+int alignment = 0;
 char *myname;
 char *infile;
 int rotate, nrows, ncols;
@@ -147,10 +148,11 @@ int main( int argc, char *argv[])
 
 	myname = argv[0];
 
-	while ((opt = getopt( argc, argv, "vfi:c:w:m:p:s:o:t:h:")) != EOF)
+	while ((opt = getopt( argc, argv, "vafi:c:w:m:p:s:o:t:h:")) != EOF)
 	{	switch( opt)
 		{ case 'v':	verbose++; break;
 		  case 'f':     manualfeed = 1; break;
+		  case 'a':     alignment = 1; break;
 		  case 'i':	imagespec = optarg; break;
 		  case 'c':	cutmarginspec = optarg; break;
 		  case 'w':	whitemarginspec = optarg; break;
@@ -294,6 +296,7 @@ static void usage()
 	fprintf( stderr, "Usage: %s <options> infile\n\n", myname);
 	fprintf( stderr, "options are:\n");
 	fprintf( stderr, "   -v:         be verbose\n");
+	fprintf( stderr, "   -a:         add alignment marks\n");
 	fprintf( stderr, "   -f:         ask manual feed on plotting/printing device\n");
 	fprintf( stderr, "   -i<box>:    specify input image size\n");
 	fprintf( stderr, "   -c<margin>: horizontal and vertical cutmargin\n");
@@ -669,6 +672,8 @@ static void printposter()
 /*******************************************************/
 static void printprolog()
 {
+	char *extraCode;
+	
 	printf( "%%%%BeginProlog\n");
 
 	printf( "/cutmark	%% - cutmark -\n"
@@ -685,6 +690,64 @@ static void printprolog()
 		"	closepath fill\n"
 		"} bind def\n\n");
 
+	if( alignment )
+	{
+		printf ("/alignmark\n"
+			"{\n"
+			"    gsave\n"
+			"    0 setgray 1 setlinewidth\n"
+			"    10 neg 10 neg rmoveto\n"
+			"    20 20 rlineto \n"
+			"    20 neg 0 rmoveto\n"
+			"    20 20 neg rlineto stroke\n"
+			"    grestore\n"
+			"} bind def\n"
+			"\n"
+			"/alignmarkhor\n"
+			"{\n"
+			"    120 0 rmoveto\n"
+			"    alignmark\n"
+			"    pagewidth 0 rmoveto\n"
+			"    240 neg 0 rmoveto\n"
+			"    alignmark\n"
+			"} bind def\n"
+			"\n"
+			"/alignmarkver\n"
+			"{\n"
+			"    0 120 rmoveto\n"
+			"    alignmark\n"
+			"    0 pageheight rmoveto\n"
+			"    0 240 neg rmoveto\n"
+			"    alignmark\n"
+			"} bind def\n");
+		extraCode = "	gsave\n"
+			"	colcount 1 gt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		alignmarkver\n"
+			"	} if\n"
+			"	rowcount 1 gt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		alignmarkhor\n"
+			"	} if\n"
+			"	colcount totalcols lt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		pagewidth 0 rmoveto\n"
+			"		alignmarkver\n"
+			"	} if\n"
+			"	rowcount totalrows lt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		0 pageheight rmoveto\n"
+			"		alignmarkhor\n"
+			"	} if\n"
+			"	grestore\n" ;
+	}
+	else
+		extraCode = "";
+	
 	printf( "%% usage: 	row col tileprolog ps-code tilepilog\n"
 		"%% these procedures output the tile specified by row & col\n"
 		"/tileprolog\n"
@@ -737,6 +800,7 @@ static void printprolog()
 	        "	pagewidth 0 rlineto\n"
 	        "	0 pageheight neg rlineto closepath stroke\n"
 	        "	grestore\n"
+
 	        "	%% print the page label\n"
 	        "	0 setgray\n"
 	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n"
@@ -748,8 +812,9 @@ static void printprolog()
 	        "	colcount strg cvs show\n"
 	        "	pagewidth 69 sub clipmargin labelsize add neg botmargin add moveto\n"
 	        "	(freesewing.org ) show\n"
+			"%s"
 	        "	showpage\n"
-                "} bind def\n\n");
+                "} bind def\n\n", extraCode);
 
 	printf( "%% usage: 	row col coverprolog ps-code coverepilog\n"
 		"%% these procedures output the cover page\n"
