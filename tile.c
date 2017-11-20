@@ -774,7 +774,6 @@ static void printprolog()
 	        "	pagewidth 0 rlineto\n"
 	        "	0 pageheight neg rlineto closepath stroke\n"
 	        "	grestore\n"
-
 	        "	%% print the page label\n"
 	        "	0 setgray\n"
 	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n"
@@ -845,7 +844,7 @@ static void printprolog()
 	        "		pagewidth 0 translate\n"
 		    "		90 rotate\n"
             "	    botmargin leftmargin translate\n"
-		    "	    0.8 colcount div dup scale\n"
+		    "	    0.78 rowcount div dup scale\n"
 	        "	    imagexl neg posterxl add imageyb neg posteryb add translate\n"
         "   } {\n"
             "	    0.1 pagewidth mul botmargin translate\n"
