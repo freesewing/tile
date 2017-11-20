@@ -672,7 +672,7 @@ static void printposter()
 /*******************************************************/
 static void printprolog()
 {
-	char *extraCode;
+	char *extraCode, *test1, *test2;
 	
 	printf( "%%%%BeginProlog\n");
 
@@ -720,33 +720,7 @@ static void printprolog()
 			"    0 240 neg rmoveto\n"
 			"    alignmark\n"
 			"} bind def\n");
-		extraCode = "	gsave\n"
-			"	colcount 1 gt\n"
-			"	{\n"
-			"		leftmargin botmargin moveto\n"
-			"		alignmarkver\n"
-			"	} if\n"
-			"	rowcount 1 gt\n"
-			"	{\n"
-			"		leftmargin botmargin moveto\n"
-			"		alignmarkhor\n"
-			"	} if\n"
-			"	colcount totalcols lt\n"
-			"	{\n"
-			"		leftmargin botmargin moveto\n"
-			"		pagewidth 0 rmoveto\n"
-			"		alignmarkver\n"
-			"	} if\n"
-			"	rowcount totalrows lt\n"
-			"	{\n"
-			"		leftmargin botmargin moveto\n"
-			"		0 pageheight rmoveto\n"
-			"		alignmarkhor\n"
-			"	} if\n"
-			"	grestore\n" ;
 	}
-	else
-		extraCode = "";
 	
 	printf( "%% usage: 	row col tileprolog ps-code tilepilog\n"
 		"%% these procedures output the tile specified by row & col\n"
@@ -811,10 +785,43 @@ static void printprolog()
 	        "	(, column ) show\n"
 	        "	colcount strg cvs show\n"
 	        "	pagewidth 69 sub clipmargin labelsize add neg botmargin add moveto\n"
-	        "	(freesewing.org ) show\n"
+	        "	(freesewing.org ) show\n" );
+	if( alignment )
+	{
+		if( rotate ) {
+			test1 = "	colcount totalcols lt\n";
+			test2 = "	colcount 1 gt\n";
+		} else {
+			test1 = "	colcount 1 gt\n";
+			test2 = "	colcount totalcols lt\n";
+		}
+		printf( "	gsave\n"
 			"%s"
-	        "	showpage\n"
-                "} bind def\n\n", extraCode);
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		alignmarkver\n"
+			"	} if\n"
+			"	rowcount 1 gt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		alignmarkhor\n"
+			"	} if\n"
+			"%s"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		pagewidth 0 rmoveto\n"
+			"		alignmarkver\n"
+			"	} if\n"
+			"	rowcount totalrows lt\n"
+			"	{\n"
+			"		leftmargin botmargin moveto\n"
+			"		0 pageheight rmoveto\n"
+			"		alignmarkhor\n"
+			"	} if\n"
+			"	grestore\n", test1, test2 ); 
+	}
+	printf( "	showpage\n"
+                "} bind def\n\n");
 
 	printf( "%% usage: 	row col coverprolog ps-code coverepilog\n"
 		"%% these procedures output the cover page\n"
