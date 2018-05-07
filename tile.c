@@ -899,7 +899,6 @@ static void printprolog()
 	        "	leftmargin clipmargin 3 mul add pageheight 5 sub moveto\n"
           "   /Helvetica findfont 11 scalefont setfont\n" );
 	printf( "	(%s ) show\n", LangPrompt( "an open source platform for made-to-measure sewing patterns" ));
-	        //"	(an open source platform for made-to-measure sewing patterns ) show\n"
 	printf( "	leftmargin clipmargin 3 mul add pageheight 62 sub moveto\n"
           "   /Helvetica findfont 42 scalefont setfont\n"
 	        "	patterntitle show\n"
