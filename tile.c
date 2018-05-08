@@ -317,6 +317,8 @@ int main( int argc, char *argv[])
 
 	printposter();
 
+	LangClose();
+	
 	exit (0);
 }
 
