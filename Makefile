@@ -1,5 +1,5 @@
-tile: tile.c
-	gcc -O -o tile tile.c -lm
+tile: tile.c tilelang.c tilelang.h 
+	gcc -O -o tile tile.c tilelang.c -lm
 
 # HPUX:	cc -O -Aa -D_POSIX_SOURCE -o tile tile.c -lm
 #       Note that this program might trigger a stupid bug in the HPUX C library,

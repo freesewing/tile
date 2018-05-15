@@ -31,11 +31,15 @@
 #  Tile now adds a coverpage, and takes the t and h options.
 #  I (joost) have yet to make this optional, and update the man page.
 #
+#  Tile has now support for language files
+#  (tile.<2 letter language code>.yml, "tile.en.yml")
+#
 # --------------------------------------------------------------
-#  Tile is a fork of 'poster' by Jos T.J. van Eijndhoven 
+#  Tile is a fork of 'poster' by Jos T.J. van Eijndhoven
 #  <J.T.J.v.Eijndhoven@ele.tue.nl>
 #
 #  Forked by Joost De Cock for freesewing.org
+#  Language extention by Wouter van Wageningen
 #
 #  Copyright (C) 1999 Jos T.J. van Eijndhoven
 #  Copyright (C) 2017 Joost De Cock
@@ -48,6 +52,7 @@
 #define DefaultCutMargin "5%"
 #define DefaultWhiteMargin "0"
 #define BUFSIZE 1024
+#define DefaultLanguage "en"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,6 +60,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+
+#include "tilelang.h"
 
 
 extern char *optarg;        /* silently set by getopt() */
@@ -105,6 +112,7 @@ char *scalespec = NULL;
 char *filespec = NULL;
 char *patterntitle = NULL;
 char *patternhandle = NULL;
+char *language = NULL;
 
 /* media sizes in ps units (1/72 inch) */
 static char *mediatable[][2] =
@@ -148,20 +156,21 @@ int main( int argc, char *argv[])
 
 	myname = argv[0];
 
-	while ((opt = getopt( argc, argv, "vafi:c:w:m:p:s:o:t:h:")) != EOF)
+	while ((opt = getopt( argc, argv, "vafi:c:l:w:m:p:s:o:t:h:")) != EOF)
 	{	switch( opt)
 		{ case 'v':	verbose++; break;
-		  case 'f':     manualfeed = 1; break;
-		  case 'a':     alignment = 1; break;
+		  case 'f': manualfeed = 1; break;
+		  case 'a': alignment = 1; break;
+			case 'l': language = optarg; break;
 		  case 'i':	imagespec = optarg; break;
 		  case 'c':	cutmarginspec = optarg; break;
 		  case 'w':	whitemarginspec = optarg; break;
 		  case 'm':	mediaspec = optarg; break;
 		  case 'p':	posterspec = optarg; break;
 		  case 's':	scalespec = optarg; break;
-		  case 'o':     filespec = optarg; break;
-		  case 't':     patterntitle = optarg; break;
-		  case 'h':     patternhandle = optarg; break;
+		  case 'o': filespec = optarg; break;
+		  case 't': patterntitle = optarg; break;
+		  case 'h': patternhandle = optarg; break;
 		  default:	usage(); break;
 		}
 	}
@@ -230,6 +239,26 @@ int main( int argc, char *argv[])
 	}
 	margin_convert( whitemarginspec, whitemargin);
 
+	/*** get the language code ***/
+	if (!language)
+	{	language = DefaultLanguage;
+		if (verbose)
+			fprintf( stderr,
+				"Using default language of %s\n",
+				language);
+	}
+	if( strlen( language ) != 2 )
+	{
+		fprintf( stderr,
+			"Invalid language code '%s''\n",
+			language);
+	}
+	else if( LangRead( language ) )
+	{
+		fprintf( stderr,
+			"Error reading language file for '%s'. Using default language of 'en'\n",
+			language);
+	}
 
 	/******************* now start doing things **************************/
 	/* open output file */
@@ -283,10 +312,12 @@ int main( int argc, char *argv[])
 		fprintf( stderr, "   Output image is: [%g,%g,%g,%g]\n",
 			posterbb[0], posterbb[1], posterbb[2], posterbb[3]);
 
-	
+
 	dsc_head2();
 
 	printposter();
+
+	LangClose();
 
 	exit (0);
 }
@@ -298,6 +329,7 @@ static void usage()
 	fprintf( stderr, "   -v:         be verbose\n");
 	fprintf( stderr, "   -a:         add alignment marks\n");
 	fprintf( stderr, "   -f:         ask manual feed on plotting/printing device\n");
+	fprintf( stderr, "   -l<lang>:   specify language code (en, nl, fr)\n");
 	fprintf( stderr, "   -i<box>:    specify input image size\n");
 	fprintf( stderr, "   -c<margin>: horizontal and vertical cutmargin\n");
 	fprintf( stderr, "   -w<margin>: horizontal and vertical additional white margin\n");
@@ -305,7 +337,7 @@ static void usage()
 	fprintf( stderr, "   -p<box>:    output poster size\n");
 	fprintf( stderr, "   -s<number>: linear scale factor for poster\n");
 	fprintf( stderr, "   -o<file>:   output redirection to named file\n\n");
-	fprintf( stderr, "   At least one of -s -p -m is mandatory, and don't give both -s and -p\n"); 
+	fprintf( stderr, "   At least one of -s -p -m is mandatory, and don't give both -s and -p\n");
 	fprintf( stderr, "   <box> is like 'A4', '3x3letter', '10x25cm', '200x200+10,10p'\n");
 	fprintf( stderr, "   <margin> is either a simple <box> or <number>%%\n\n");
 
@@ -327,7 +359,7 @@ static void postersize( char *scalespec, char *posterspec)
 	double drawablex, drawabley; /* effective drawable size of media */
 	double mediax, mediay;
 	double tmpposter[4];
-	
+
 	/* available drawing area per sheet: */
 	drawablex = mediasize[2] - 2.0*cutmargin[0];
 	drawabley = mediasize[3] - 2.0*cutmargin[1];
@@ -368,7 +400,7 @@ static void postersize( char *scalespec, char *posterspec)
 			exch( tmpposter[0], tmpposter[1]);
 			exch( tmpposter[2], tmpposter[3]);
 		}
-			
+
 
 		/* Should we tilt the poster to landscape style? */
 		if ((imagebb[3] - imagebb[1]) < (imagebb[2] - imagebb[0]))
@@ -579,7 +611,7 @@ static int dsc_infile( double ps_bb[4])
 	got_bb = 0;
 	dsc_cont = inbody = gotall = level = atend = 0;
 	while (!gotall && (gets(buf) != NULL))
-	{	
+	{
 		if (buf[0] != '%')
 		{	dsc_cont = 0;
 			if (!inbody) inbody = 1;
@@ -643,7 +675,7 @@ static void dsc_head2()
 	printf ("%%%%BoundingBox: 0 0 %d %d\n", (int)(mediasize[2]), (int)(mediasize[3]));
 	printf ("%%%%EndComments\n\n");
 
-	printf ("%% Print poster %s in %dx%d tiles with %.3g magnification\n", 
+	printf ("%% Print poster %s in %dx%d tiles with %.3g magnification\n",
 		infile, nrows, ncols, scale);
 }
 
@@ -673,7 +705,7 @@ static void printposter()
 static void printprolog()
 {
 	char *extraCode, *test1, *test2;
-	
+
 	printf( "%%%%BeginProlog\n");
 
 	printf( "/cutmark	%% - cutmark -\n"
@@ -721,7 +753,7 @@ static void printprolog()
 			"    alignmark\n"
 			"} bind def\n");
 	}
-	
+
 	printf( "%% usage: 	row col tileprolog ps-code tilepilog\n"
 		"%% these procedures output the tile specified by row & col\n"
 		"/tileprolog\n"
@@ -776,13 +808,13 @@ static void printprolog()
 	        "	grestore\n"
 	        "	%% print the page label\n"
 	        "	0 setgray\n"
-	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n"
-	        "	(Page ) show\n"
-	        "	pagenr strg cvs show\n"
-	        "	(: row ) show\n"
-	        "	rowcount strg cvs show\n"
-	        "	(, column ) show\n"
-	        "	colcount strg cvs show\n"
+	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n" );
+	printf( "	(%s ) show\n", LangPrompt( "Page" ) );
+	printf( "	pagenr strg cvs show\n"
+	        "	(: %s ) show\n", LangPrompt( "row" ) );
+	printf( "	rowcount strg cvs show\n"
+	        "	(, %s ) show\n", LangPrompt( "column" ) );
+	printf( "	colcount strg cvs show\n"
 	        "	pagewidth 69 sub clipmargin labelsize add neg botmargin add moveto\n"
 	        "	(freesewing.org ) show\n" );
 	if( alignment )
@@ -817,7 +849,7 @@ static void printprolog()
 			"		0 pageheight rmoveto\n"
 			"		alignmarkhor\n"
 			"	} if\n"
-			"	grestore\n", test1, test2 ); 
+			"	grestore\n", test1, test2 );
 	}
 	printf( "	showpage\n"
                 "} bind def\n\n");
@@ -861,16 +893,16 @@ static void printprolog()
 	        "	grestore\n"
 	        "	%% print the page label\n"
 	        "	0 setgray\n"
-	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n"
-	        "	( cover page ) show\n"
-	        "	leftmargin clipmargin 3 mul add pageheight 10 add moveto\n"
-            "   /Helvetica findfont 24 scalefont setfont\n"
+	        "	leftmargin clipmargin 3 mul add clipmargin labelsize add neg botmargin add moveto\n" );
+	printf( "	( %s ) show\n", LangPrompt( "cover page" ));
+	printf(	"	leftmargin clipmargin 3 mul add pageheight 10 add moveto\n"
+          "   /Helvetica findfont 24 scalefont setfont\n"
 	        "	(freesewing) show\n"
 	        "	leftmargin clipmargin 3 mul add pageheight 5 sub moveto\n"
-            "   /Helvetica findfont 11 scalefont setfont\n"
-	        "	(an open source platform for made-to-measure sewing patterns ) show\n"
-	        "	leftmargin clipmargin 3 mul add pageheight 62 sub moveto\n"
-            "   /Helvetica findfont 42 scalefont setfont\n"
+          "   /Helvetica findfont 11 scalefont setfont\n" );
+	printf( "	(%s ) show\n", LangPrompt( "an open source platform for made-to-measure sewing patterns" ));
+	printf( "	leftmargin clipmargin 3 mul add pageheight 62 sub moveto\n"
+          "   /Helvetica findfont 42 scalefont setfont\n"
 	        "	patterntitle show\n"
 	        "	leftmargin clipmargin 4 mul add pageheight 80 sub moveto\n"
             "   /Helvetica findfont 9 scalefont setfont\n"
@@ -885,7 +917,7 @@ static void printprolog()
 	        "	pagewidth clipmargin 2 mul add pageheight 70 sub lineto stroke\n"
 	        "	gsave\n"
             "   pagewidth 75 sub pageheight 60 sub translate\n"
-	        "   logo\n" 
+	        "   logo\n"
 	        "	grestore\n"
 	        "	showpage\n"
                 "} bind def\n\n");
@@ -948,6 +980,7 @@ static void printprolog()
             "   /h { closepath } bind def\n"
 	        "   /f { fill } bind def\n"
             "	gsave\n"
+
 	        "	0 setgray\n"
             "   36.75 52.931 m 35.656 52.158 35.715 52.255 34.832 51.966 c 32.812 51.306\n"
             "   30.875 51.669 28.578 51.861 c 27.887 51.939 27.199 51.986 26.531 51.99\n"
@@ -1102,8 +1135,8 @@ static void printprolog()
             "   22.824 18.404 m 23.262 18.396 l 23.43 18.396 23.578 18.388 23.586 18.373\n"
             "   c 23.613 18.349 23.52 17.779 23.469 17.654 c 23.406 17.509 23.199 17.509\n"
             "   23.09 17.677 c 22.938 17.923 22.836 18.126 22.832 18.267 c h f\n"
-	            "	grestore\n"
-                "} bind def\n\n");
+            "	grestore\n"
+          "} bind def\n\n");
 
 	printf( "%%%%EndProlog\n\n");
 	printf( "%%%%BeginSetup\n");
@@ -1142,7 +1175,7 @@ static void printprolog()
 	        rotate?"true":"false");
 
 	printf( "/Helvetica findfont labelsize scalefont setfont\n");
-	
+
     printf( "/patterntitle (%s) def\n", patterntitle);
     printf( "/patternhandle (%s) def\n", patternhandle);
 
