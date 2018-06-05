@@ -127,10 +127,13 @@ void LangClose( void )
 
 char *LangPrompt( char *defPrompt )
 {
-  for( int i; i < LANG_PROMPTS_MAX ; i ++ )
+  if( langBuffer )
   {
-    if( strcmp( langPrompts[ i ], defPrompt ) == 0 )
-      return( langTranslates[ i ] );
+    for( int i; i < LANG_PROMPTS_MAX ; i ++ )
+    {
+      if( strcmp( langPrompts[ i ], defPrompt ) == 0 )
+        return( langTranslates[ i ] );
+    }
   }
   return( defPrompt );
 }
