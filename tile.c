@@ -908,7 +908,7 @@ static void printprolog()
 	        "	(FreeSewing) show\n"
 	        "	leftmargin clipmargin 3 mul add pageheight 5 sub moveto\n"
           	"	/Helvetica findfont 11 scalefont setfont\n" );
-	printf( "	(%s ) show\n", LangPrompt( "slogan" ));
+	printf( "	(Come for the sewing patterns. Stay for the community.) show\n");
 	printf( "	leftmargin clipmargin 3 mul add pageheight 62 sub moveto\n"
           	"	/Helvetica findfont 42 scalefont setfont\n"
 			"	patterntitle show\n"
