@@ -42,7 +42,7 @@
 #  Language extention by Wouter van Wageningen
 #
 #  Copyright (C) 1999 Jos T.J. van Eijndhoven
-#  Copyright (C) 2017 Joost De Cock
+#  Copyright (C) 2021 Joost De Cock
 # --------------------------------------------------------------
 */
 
@@ -111,7 +111,7 @@ char *whitemarginspec = NULL;
 char *scalespec = NULL;
 char *filespec = NULL;
 char *patterntitle = NULL;
-char *patternhandle = NULL;
+char *patternurl = NULL;
 char *language = NULL;
 
 /* media sizes in ps units (1/72 inch) */
@@ -156,7 +156,7 @@ int main( int argc, char *argv[])
 
 	myname = argv[0];
 
-	while ((opt = getopt( argc, argv, "vafi:c:l:w:m:p:s:o:t:h:")) != EOF)
+	while ((opt = getopt( argc, argv, "vafi:c:l:w:m:p:s:o:t:h:u:")) != EOF)
 	{	switch( opt)
 		{ case 'v':	verbose++; break;
 		  case 'f': manualfeed = 1; break;
@@ -170,7 +170,7 @@ int main( int argc, char *argv[])
 		  case 's':	scalespec = optarg; break;
 		  case 'o': filespec = optarg; break;
 		  case 't': patterntitle = optarg; break;
-		  case 'h': patternhandle = optarg; break;
+		  case 'u': patternurl = optarg; break;
 		  default:	usage(); break;
 		}
 	}
@@ -336,7 +336,9 @@ static void usage()
 	fprintf( stderr, "   -m<box>:    media paper size\n");
 	fprintf( stderr, "   -p<box>:    output poster size\n");
 	fprintf( stderr, "   -s<number>: linear scale factor for poster\n");
-	fprintf( stderr, "   -o<file>:   output redirection to named file\n\n");
+	fprintf( stderr, "   -o<file>:   output redirection to named file\n");
+	fprintf( stderr, "   -t<title>:  title for the cover page\n");
+	fprintf( stderr, "   -u<title>:  url/link for the cover page\n\n");
 	fprintf( stderr, "   At least one of -s -p -m is mandatory, and don't give both -s and -p\n");
 	fprintf( stderr, "   <box> is like 'A4', '3x3letter', '10x25cm', '200x200+10,10p'\n");
 	fprintf( stderr, "   <margin> is either a simple <box> or <number>%%\n\n");
@@ -903,10 +905,10 @@ static void printprolog()
 	printf( "	( %s ) show\n", LangPrompt( "cover page" ));
 	printf(	"	leftmargin clipmargin 3 mul add pageheight 10 add moveto\n"
           	"	/Helvetica findfont 24 scalefont setfont\n"
-	        "	(freesewing) show\n"
+	        "	(FreeSewing) show\n"
 	        "	leftmargin clipmargin 3 mul add pageheight 5 sub moveto\n"
           	"	/Helvetica findfont 11 scalefont setfont\n" );
-	printf( "	(%s ) show\n", LangPrompt( "an open source platform for made-to-measure sewing patterns" ));
+	printf( "	(%s ) show\n", LangPrompt( "slogan" ));
 	printf( "	leftmargin clipmargin 3 mul add pageheight 62 sub moveto\n"
           	"	/Helvetica findfont 42 scalefont setfont\n"
 			"	patterntitle show\n"
@@ -914,8 +916,7 @@ static void printprolog()
 	        "	leftmargin clipmargin 4 mul add pageheight 80 sub moveto\n"
           	"	/Helvetica findfont 9 scalefont setfont\n"
 	        "	0.5 setgray\n"
-	        "	(freesewing.org/drafts/) show\n"
-	        "	patternhandle show\n"
+	        "	patternurl show\n"
 	        "	0 setgray\n"
           	"	/Helvetica findfont labelsize scalefont setfont\n"
 	        "	pagewidth 69 sub clipmargin labelsize add neg botmargin add moveto\n"
@@ -1177,7 +1178,7 @@ static void printprolog()
 	printf( "/Helvetica findfont labelsize scalefont setfont\n");
 
 	printf( "/patterntitle (%s) def\n", patterntitle);
-	printf( "/patternhandle (%s) def\n", patternhandle);
+	printf( "/patternurl (%s) def\n", patternurl);
 
 	printf( "%%%%EndSetup\n");
 }
